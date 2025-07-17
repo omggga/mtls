@@ -46,6 +46,20 @@ RUN /opt/cprocsp/bin/amd64/certmgr -install -store uMy -pfx -file /tmp/certs/cer
 ```
 > Replace ```certificatename.pfx``` and ```XXXXXXXX``` with your actual certificate filename and password.
 
+### Exporting ```.key``` Files from a ```.pfx```
+> I encountered issues when trying to import a .pfx certificate directly into the CryptoPro container — the process completed without error, but the certificate was not fully functional, likely due to internal key access restrictions.
+
+> The issue was resolved by first importing the .pfx inside the container to generate .key containers, and then copying those .key files out for consistent reuse. This approach ensures proper key registration and reliable operation within the cpnginx environment.
+If you're having trouble importing a ```.pfx``` certificate directly into your project, you can import it inside the container, then extract the generated ```.key``` files for reuse:
+```
+su - cpnginx
+/opt/cprocsp/bin/amd64/certmgr -inst -provtype 24 -pfx -pin "YOUR_PASSWORD" -file /tmp/cert.pfx
+/opt/cprocsp/bin/amd64/certmgr -list
+exit
+docker cp <container_id>:/var/opt/cprocsp/keys/cpnginx ./cpnginx-keys
+```
+> These ```.key``` files can then be reused in your project by placing them under ```cpnginx-keys/cpnginx/```.
+
 ## NGINX Configuration (cpnginx)
 
 In the ```nginx.conf``` file, you must specify the SKI (Subject Key Identifier) of the certificate used to sign the TLS tunnel for mTLS.
