@@ -45,3 +45,15 @@ If key containers are not available but you have a ```.pfx```, you can install t
 RUN /opt/cprocsp/bin/amd64/certmgr -install -store uMy -pfx -file /tmp/certs/certificatename.pfx -pin XXXXXXXX -silent -provtype 80 -provname 'Crypto-Pro GOST R 34.10-2012 Cryptographic Service Provider'
 ```
 > Replace ```certificatename.pfx``` and ```XXXXXXXX``` with your actual certificate filename and password.
+
+## NGINX Configuration (cpnginx)
+
+In the ```nginx.conf``` file, you must specify the SKI (Subject Key Identifier) of the certificate used to sign the TLS tunnel for mTLS.
+
+```
+proxy_ssl_certificate 0xYOUR_SKI_HERE;
+```
+
+Replace ```0xYOUR_SKI_HERE``` with the actual SKI of the certificate that is installed in the CryptoPro store and has access to the private key.
+
+This SKI identifies the GOST certificate that will be used for establishing the mutual TLS connection.
